@@ -7,36 +7,45 @@ import javax.persistence.Entity;
 import br.com.lubank.banco.dao.ContaDAO;
 
 /**
- * Classe que gera uma Conta Corrente.
- * As taxas de saque e transfer�ncias s�o significativamente baixas.
- * Tipo de Conta = 001
+ * Classe que gera uma Conta Corrente. As taxas de saque e transfer�ncias s�o
+ * significativamente baixas. Tipo de Conta = 001
  * 
  * @author Lucas Melo Costa
  * @serial 1L
  */
 @Entity
 public class ContaCorrente extends Conta implements Taxas {
-	
+
 	private static final long serialVersionUID = 1L;
 	private static int tipoDeConta = 001;
 
 	public ContaCorrente() {
 		super(tipoDeConta);
 	}
+
+	/**
+	 * Construtor que pede numero, nome, saldo e limite.
+	 * 
+	 * @param numero - int
+	 * @param nome   - String
+	 * @param saldo  - BigDecimal
+	 * @param limite - BigDecimal
+	 */
 	public ContaCorrente(int numero, String nome, BigDecimal saldo, BigDecimal limite) {
 		super(numero, nome, saldo, limite, tipoDeConta);
 	}
-	
-/**
- * Taxa de Saque deste tipo de conta � 2.50
- */
+
+	/**
+	 * Taxa de Saque deste tipo de conta é 2.50
+	 */
 	@Override
 	public BigDecimal taxaSaque() {
 		return new BigDecimal("2.50");
 	}
-/**
- * Taxa de transferencia deste tipo de conta � 1.20
- */
+
+	/**
+	 * Taxa de transferencia deste tipo de conta é 1.20
+	 */
 	@Override
 	public BigDecimal taxaTransferencia() {
 		return new BigDecimal("1.20");
@@ -50,17 +59,24 @@ public class ContaCorrente extends Conta implements Taxas {
 	public boolean getNumeroBoolean(int numero) {
 		return super.getNumeroBoolean(numero);
 	}
-/**
- * Subtrai o saldo da conta com o 'valor + a taxa de saque'.
- * Gera contato com o banco de dados atraves do numero. 
- * 
- * @param numero
- * @param valor
- * @return Se o saldo for menor que o valor a opera��o ira retornar false,
- * mas se for maior ela ir� retornar true e o saldo vai ser atualizado no banco de dados.
- */
+
+	public void inserirDados(String Nome, int Numero, BigDecimal Limite, BigDecimal Saldo) {
+		super.inserirDados(Nome, Numero, Limite, Saldo);
+	}
+
+	/**
+	 * Subtrai o saldo da conta com o 'valor + a taxa de saque'. Gera contato com o
+	 * banco de dados atraves do numero.
+	 * 
+	 * @param numero
+	 * @param valor
+	 * @return Se o saldo for menor que o valor a operação irá retornar false, mas
+	 *         se for maior ela irá retornar true e o saldo vai ser atualizado no
+	 *         banco de dados.
+	 */
 	public boolean saca(int numero, BigDecimal valor) {
-		ContaDAO contaDao = new ContaDAO();;
+		ContaDAO contaDao = new ContaDAO();
+		;
 		for (ContaCorrente c : contaDao.getContatoCorrente(numero)) {
 			Float v1 = c.getSaldo().floatValue();
 			Float v2 = valor.add(this.taxaSaque()).floatValue();
@@ -70,22 +86,24 @@ public class ContaCorrente extends Conta implements Taxas {
 			} else {
 				c.saldo = c.saldo.subtract(valor).subtract(this.taxaSaque());
 				System.out.println(
-						"Transa�ao concluida!\n{O saldo da conta de '" + c.getNome() + "' �: " + c.saldo + "}");
+						"Transação concluida!\n{O saldo da conta de '" + c.getNome() + "' é: " + c.saldo + "}");
 				contaDao.updateContaCorrente(c);
 				return true;
 			}
 		}
 		return true;
 	}
-/**
- * Soma o valor inserido com o saldo da conta.
- * Gera contato com o banco de dados atraves do numero.
- * 
- * @param numero
- * @param valor
- * @return Se o limite da conta for menor que a soma a opera��o ir� retornar false, mas se o limite for maior
- * ir� retornar true e o saldo vai ser atualizado no banco de dados.
- */
+
+	/**
+	 * Soma o valor inserido com o saldo da conta. Gera contato com o banco de dados
+	 * atraves do numero.
+	 * 
+	 * @param numero
+	 * @param valor
+	 * @return Se o limite da conta for menor que a soma a operação irá retornar
+	 *         false, mas se o limite for maior irá retornar true e o saldo vai ser
+	 *         atualizado no banco de dados.
+	 */
 	public Boolean deposita(int numero, BigDecimal valor) {
 		ContaDAO contaDao = new ContaDAO();
 		for (ContaCorrente c : contaDao.getContatoCorrente(numero)) {
@@ -103,12 +121,13 @@ public class ContaCorrente extends Conta implements Taxas {
 		}
 		return true;
 	}
-/**
- * Gera contato com o banco de dados atraves do numero.
- * 
- * @param numero
- * @return Retorna uma string com o Saldo e o limite da conta.
- */
+
+	/**
+	 * Um metodo void que gera contato com o banco de dados atraves do numero.
+	 * 
+	 * @param numero
+	 * @return Retorna um sysout com o Saldo e o limite da conta.
+	 */
 	public void mostrarSaldo(int numero) {
 		ContaDAO contaDao = new ContaDAO();
 		for (ContaCorrente c : contaDao.getContatoCorrente(numero)) {
@@ -116,12 +135,31 @@ public class ContaCorrente extends Conta implements Taxas {
 		}
 
 	}
-/**
- * Gera contato com o banco de dados atraves do numero.
- * 
- * @param numero
- * @return Retorna uma string com: Tipo da conta, Nome, Numero, Saldo, Limite e Data de Atualiza��o.
- */
+
+	/**
+	 * Um metodo String que gera contato com o banco de dados atraves do numero.
+	 * 
+	 * @param numero
+	 * @return Retorna um string com o Saldo e o limite da conta.
+	 */
+	public String mostrarSaldoString(int numero) {
+		ContaDAO contaDao = new ContaDAO();
+		String saldo = null;
+		String limite = null;
+		for (ContaCorrente c : contaDao.getContatoCorrente(numero)) {
+			saldo = c.getSaldo().toString();
+			limite = c.getLimite().toString();
+		}
+		return "Saldo: " + saldo + "\nLimite: " + limite;
+	}
+
+	/**
+	 * Um metodo void que gera contato com o banco de dados atraves do numero.
+	 * 
+	 * @param numero
+	 * @return Retorna um sysout com: Tipo da conta, Nome, Numero, Saldo, Limite e
+	 *         Data de Atualiza��o.
+	 */
 	public void mostrarDados(int numero) {
 		ContaDAO contaDao = new ContaDAO();
 		for (ContaCorrente c : contaDao.getContatoCorrente(numero)) {
@@ -130,13 +168,40 @@ public class ContaCorrente extends Conta implements Taxas {
 					+ c.getDataAtualizacao());
 		}
 	}
-/**
- * Indicada para devolver informa��es da conta para usuarios que n�o s�o donos da conta.
- * Gera contato com o banco de dados atraves do numero.
- * 
- * @param numero
- * @return Retorna uma string com o Nome e o Numero da conta.
- */
+
+	/**
+	 * Um metodo String que gera contato com o banco de dados atraves do numero.
+	 * 
+	 * @param numeroDaConta
+	 * @return Retorna um string com: Nome, Numero, Saldo, Limite e Data de
+	 *         Cadastro.
+	 */
+	public String mostrarDadosString(int numeroDaConta) {
+		ContaDAO contaDao = new ContaDAO();
+		String nome = null;
+		String numero = null;
+		String saldo = null;
+		String limite = null;
+		String dataCadastro = null;
+		for (ContaCorrente c : contaDao.getContatoCorrente(numeroDaConta)) {
+			nome = c.getNome();
+			numero = String.valueOf(c.getNumero());
+			saldo = c.getSaldo().toString();
+			limite = c.getLimite().toString();
+			dataCadastro = c.getDataCadastro().toString();
+
+		}
+		return "Nome: " + nome + "\nNumero: " + numero + "\nSaldo: " + saldo + "\nLimite" + limite
+				+ "\nData de cadastro: " + dataCadastro;
+	}
+
+	/**
+	 * Indicada para devolver informa��es da conta para usuarios que n�o s�o donos
+	 * da conta. Gera contato com o banco de dados atraves do numero.
+	 * 
+	 * @param numero
+	 * @return Retorna uma string com o Nome e o Numero da conta.
+	 */
 	public void mostrarDadosDestinatario(int numero) {
 		ContaDAO contaDao = new ContaDAO();
 		for (ContaCorrente c : contaDao.getContatoCorrente(numero)) {
@@ -144,16 +209,17 @@ public class ContaCorrente extends Conta implements Taxas {
 					"Nome destinat�rio: " + c.getNome() + "." + "\nNumero destinat�rio: " + c.getNumero() + ".");
 		}
 	}
-/**
- * Verifica se o saldo da conta � maior que o valor inserido.
- * Gera contato com o banco de dados atraves do numero.
- * 
- * @param numero
- * @param valor
- * @return Se o saldo for menor que o valor a opera��o ir� retornar false,
- * mas se for maior ela ir� retornar true.
- *
- */
+
+	/**
+	 * Verifica se o saldo da conta � maior que o valor inserido. Gera contato com o
+	 * banco de dados atraves do numero.
+	 * 
+	 * @param numero
+	 * @param valor
+	 * @return Se o saldo for menor que o valor a opera��o ir� retornar false, mas
+	 *         se for maior ela ir� retornar true.
+	 *
+	 */
 	public boolean verificaSaldo(int numero, BigDecimal valor) {
 		ContaDAO contaDao = new ContaDAO();
 		for (ContaCorrente c : contaDao.getContatoCorrente(numero)) {
@@ -167,7 +233,16 @@ public class ContaCorrente extends Conta implements Taxas {
 		}
 		return true;
 	}
-	
+
+	/**
+	 * Verifica se o saldo da 'conta + taxa de saque' é maior que o valor inserido.
+	 * Gera contato com o banco de dados atraves do numero.
+	 * 
+	 * @param numero
+	 * @param valor
+	 * @return Se o saldo for menor que o valor a operação irá retornar false, mas
+	 *         se for maior ela irá retornar true.	 *
+	 */
 	public boolean verificaSaldoSaque(int numero, BigDecimal valor) {
 		ContaDAO contaDao = new ContaDAO();
 		for (ContaCorrente c : contaDao.getContatoCorrente(numero)) {
@@ -181,7 +256,16 @@ public class ContaCorrente extends Conta implements Taxas {
 		}
 		return true;
 	}
-	
+
+	/**
+	 * Verifica se o saldo da 'conta + taxa de transferência' é maior que o valor
+	 * inserido. Gera contato com o banco de dados atraves do numero.
+	 * 
+	 * @param numero
+	 * @param valor
+	 * @return Se o saldo for menor que o valor a operação irá retornar false, mas
+	 *         se for maior ela irá retornar true.	 *
+	 */
 	public boolean verificaSaldoTransfere(int numero, BigDecimal valor) {
 		ContaDAO contaDao = new ContaDAO();
 		for (ContaCorrente c : contaDao.getContatoCorrente(numero)) {
@@ -195,15 +279,16 @@ public class ContaCorrente extends Conta implements Taxas {
 		}
 		return true;
 	}
-/**
- * Verifica se o valor inserido � maior que o limite da conta subtraido pelo saldo da conta.
- * Gera contato com o banco de dados atraves do numero.
- * 
- * @param numero
- * @param valor
- * @return Se o valor for maior ir� retornar false, mas se for menor ir� retornar true.
- */
-	
+
+	/**
+	 * Verifica se o valor inserido � maior que o limite da conta subtraido pelo
+	 * saldo da conta. Gera contato com o banco de dados atraves do numero.
+	 * 
+	 * @param numero
+	 * @param valor
+	 * @return Se o valor for maior ir� retornar false, mas se for menor ir�
+	 *         retornar true.
+	 */
 	public Boolean verificaLimite(int numero, BigDecimal valor) {
 		ContaDAO contaDao = new ContaDAO();
 		for (ContaCorrente c : contaDao.getContatoCorrente(numero)) {
@@ -211,22 +296,25 @@ public class ContaCorrente extends Conta implements Taxas {
 			BigDecimal v2 = c.getLimite();
 			if (v1.compareTo(v2.subtract(c.getSaldo())) == 1) {
 				return false;
-			} else if (v1.compareTo(v2.subtract(c.getSaldo())) == 0){
+			} else if (v1.compareTo(v2.subtract(c.getSaldo())) == 0) {
 				return false;
-			}				
+			}
 		}
 		return true;
 	}
-/**
- * Transfere um valor especifico do saldo de uma conta para outra conta.
- * Gera contato com o banco de dados atraves do numero.
- * 
- * @param contaSaque
- * @param contaDestino
- * @param valor
- * @return Se a conta do saque possuir saldo suficiente e a conta de destino possuir limite a transaferencia ser� concluida.
- * Se algum desses parametros n�o forem atendidos a opera��o ira retornar uma string especificando qual parametro n�o foi atendido.
- */
+
+	/**
+	 * Transfere um valor especifico do saldo de uma conta para outra conta. Gera
+	 * contato com o banco de dados atraves do numero.
+	 * 
+	 * @param contaSaque
+	 * @param contaDestino
+	 * @param valor
+	 * @return Se a conta do saque possuir saldo suficiente e a conta de destino
+	 *         possuir limite a transaferencia ser� concluida. Se algum desses
+	 *         parametros n�o forem atendidos a opera��o ira retornar uma string
+	 *         especificando qual parametro n�o foi atendido.
+	 */
 	public void transfere(int contaSaque, int contaDestino, BigDecimal valor) {
 		ContaDAO contaDaoSaque = new ContaDAO();
 		ContaDAO contaDaoDestino = new ContaDAO();
@@ -247,62 +335,17 @@ public class ContaCorrente extends Conta implements Taxas {
 		}
 	}
 
-	public void inserirDados(String Nome, int Numero, BigDecimal Limite, BigDecimal Saldo) {
-		super.inserirDados(Nome, Numero, Limite, Saldo);
-	}
-/**
- * Retorna o nome e o tipo da conta.
- * Gera contato com o banco de dados atraves do numero.
- * 
- * @param numero
- */
-	public void getTipoDeConta(int numero) {
-		ContaDAO contaDao = new ContaDAO();
-		if (contaDao.getTipoDeConta(numero) == 001) {
-			for (ContaCorrente c : contaDao.getContatoCorrente(numero)) {
-				System.out.println(
-						"Nome destinat�rio: " + c.getNome() + "." + "\nConta do tipo Conta Corrente(001).");
-			}
-		} else {
-			if (contaDao.getTipoDeConta(numero) == 013) {
-				for (ContaCorrente c : contaDao.getContatoCorrente(numero)) {
-					System.out.println("Nome destinat�rio: " + c.getNome() + "." + "\nConta do tipo Conta Poupan�a(013).");
-				}
-			} else {
-				System.out.println("Tipo de conta n�o encontrada.");
-			}
-		}
-	}
-	
-	public String mostrarDadosString(int numeroDaConta) {
-		ContaDAO contaDao = new ContaDAO();
-		String nome = null;
-		String numero = null;
-		String saldo = null;
-		String limite = null;
-		String dataCadastro = null;
-		for (ContaCorrente c : contaDao.getContatoCorrente(numeroDaConta)) {
-			nome = c.getNome();
-			numero = String.valueOf(c.getNumero());
-			saldo = c.getSaldo().toString();
-			limite = c.getLimite().toString();
-			dataCadastro = c.getDataCadastro().toString();
-			
-		}return "Nome: " +nome + "\nNumero: " + numero + "\nSaldo: " + saldo + "\nLimite" + limite + "\nData de cadastro: " + dataCadastro;
-	}
-	
-	public String mostrarSaldoString(int numero) {
-		ContaDAO contaDao = new ContaDAO();
-		String saldo = null;
-		String limite = null;
-		for (ContaCorrente c : contaDao.getContatoCorrente(numero)) {
-			saldo = c.getSaldo().toString();
-			limite = c.getLimite().toString();
-		}
-		return "Saldo: " + saldo + "\nLimite: " + limite;
-
-	}
-	
+	/**
+	 * Compara se a conta de saque tem saldo e se a conta de destino tem o limite
+	 * necessario para o deposito.
+	 * 
+	 * @param contaSaque
+	 * @param contaDestino
+	 * @param valor
+	 * @return Retorna 1 se a contaSaque tem saldo e a contaDestino tem limite.
+	 *         Retorna -1 se a contaSaque não tem saldo. Retorna 0 se a contaDestino
+	 *         não tem limite. Retorna 2 se nenhum parametro foi atendido.
+	 */
 	public int transfereCompara(int contaSaque, int contaDestino, BigDecimal valor) {
 		ContaDAO contaDaoSaque = new ContaDAO();
 		ContaDAO contaDaoDestino = new ContaDAO();
@@ -322,7 +365,18 @@ public class ContaCorrente extends Conta implements Taxas {
 		}
 		return 2;
 	}
-	
+
+	/**
+	 * Um metodo string que transfere o saldo da contaSaque para a contaDestino.
+	 * 
+	 * @param contaSaque
+	 * @param contaDestino
+	 * @param valor
+	 * @return Retorna uma string se a contaSaque tem saldo e a contaDestino tem
+	 *         limite e faz a transferencia. Agora se a contaSaque não tem saldo e a
+	 *         contaDestino não tem limite retorna uma String especifica para cada
+	 *         ocasião.
+	 */
 	public String transfereString(int contaSaque, int contaDestino, BigDecimal valor) {
 		ContaDAO contaDaoSaque = new ContaDAO();
 		ContaDAO contaDaoDestino = new ContaDAO();
@@ -347,4 +401,27 @@ public class ContaCorrente extends Conta implements Taxas {
 		return "Erro não encontrado";
 	}
 
+	/**
+	 * Retorna o nome e o tipo da conta. Gera contato com o banco de dados atraves
+	 * do numero.
+	 * 
+	 * @param numero
+	 */
+	public void getTipoDeConta(int numero) {
+		ContaDAO contaDao = new ContaDAO();
+		if (contaDao.getTipoDeConta(numero) == 001) {
+			for (ContaCorrente c : contaDao.getContatoCorrente(numero)) {
+				System.out.println("Nome destinat�rio: " + c.getNome() + "." + "\nConta do tipo Conta Corrente(001).");
+			}
+		} else {
+			if (contaDao.getTipoDeConta(numero) == 013) {
+				for (ContaCorrente c : contaDao.getContatoCorrente(numero)) {
+					System.out.println(
+							"Nome destinat�rio: " + c.getNome() + "." + "\nConta do tipo Conta Poupan�a(013).");
+				}
+			} else {
+				System.out.println("Tipo de conta n�o encontrada.");
+			}
+		}
+	}
 }

@@ -23,6 +23,13 @@ public class LoginForm {
 		this.senha = senha;
 	}
 
+	/**
+	 * Gera um token de usuario através do email e da senha.
+	 * 
+	 * @param email
+	 * @param senha
+	 * @return Retorna um token de usuario.
+	 */
 	public UsernamePasswordAuthenticationToken converter() {
 		return new UsernamePasswordAuthenticationToken(email, senha);
 	}

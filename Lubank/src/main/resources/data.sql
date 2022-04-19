@@ -7,9 +7,6 @@ INSERT INTO PERFIL(id, nome) VALUES(2, 'ROLE_MODERADOR');
 INSERT INTO USUARIO_PERFIS(usuario_id, perfis_id) VALUES(1, 1);
 INSERT INTO USUARIO_PERFIS(usuario_id, perfis_id) VALUES(2, 2);
 
-INSERT INTO CURSO(nome, categoria) VALUES('Spring Boot', 'Programação');
-INSERT INTO CURSO(nome, categoria) VALUES('HTML 5', 'Front-end');
+INSERT INTO CONTA(DTYPE, id, numero, nome, limite, saldo, tipoDeConta, dataAtualizacao, dataCadastro) VALUES('ContaCorrente', '1', '123456789', 'Teste Conta Corrente', '5000', '2500', 'ContaCorrente', '2022-04-19 08:40:04.000000', '2022-04-19 07:46:23.000000');
+INSERT INTO CONTA(DTYPE, id, numero, nome, limite, saldo, tipoDeConta, dataAtualizacao, dataCadastro) VALUES('ContaPoupanca', '2', '223456789', 'Teste Conta Poupanca', '5000', '2500', 'ContaPoupanca', '2022-04-19 08:40:04.000000', '2022-04-19 07:46:23.000000');
 
-INSERT INTO TOPICO(titulo, mensagem, data_criacao, status, autor_id, curso_id) VALUES('Dúvida', 'Erro ao criar projeto', '2019-05-05 18:00:00', 'NAO_RESPONDIDO', 1, 1);
-INSERT INTO TOPICO(titulo, mensagem, data_criacao, status, autor_id, curso_id) VALUES('Dúvida 2', 'Projeto não compila', '2019-05-05 19:00:00', 'NAO_RESPONDIDO', 1, 1);
-INSERT INTO TOPICO(titulo, mensagem, data_criacao, status, autor_id, curso_id) VALUES('Dúvida 3', 'Tag HTML', '2019-05-05 20:00:00', 'NAO_RESPONDIDO', 1, 2);

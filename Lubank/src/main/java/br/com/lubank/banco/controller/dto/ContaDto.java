@@ -42,6 +42,12 @@ public class ContaDto {
 		return dataAtualizacao;
 	}
 
+	/**
+	 * Converte um Page Conta em um Page ContaDto.
+	 * 
+	 * @param contas
+	 * @return Retorna um Page de ContaDto.
+	 */
 	public static Page<ContaDto> converter(Page<Conta> contas) {
 		return contas.map(ContaDto::new);
 	}

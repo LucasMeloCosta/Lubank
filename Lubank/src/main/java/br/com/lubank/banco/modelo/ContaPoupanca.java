@@ -26,6 +26,7 @@ public class ContaPoupanca extends Conta implements Taxas {
 	public ContaPoupanca() {
 		super(tipoDeConta);
 	}
+
 	public ContaPoupanca(int numero, String nome, BigDecimal saldo, BigDecimal limite) {
 		super(numero, nome, saldo, limite, tipoDeConta);
 	}
@@ -54,6 +55,10 @@ public class ContaPoupanca extends Conta implements Taxas {
 
 	public boolean getNumeroBoolean(int numero) {
 		return super.getNumeroBoolean(numero);
+	}
+
+	public void inserirDados(String nome, int numero, BigDecimal limite, BigDecimal saldo) {
+		super.inserirDados(nome, numero, limite, saldo);
 	}
 
 	/**
@@ -124,11 +129,11 @@ public class ContaPoupanca extends Conta implements Taxas {
 	}
 
 	/**
-	 * Gera contato com o banco de dados atraves do numero.
+	 * Um metodo void que gera contato com o banco de dados atraves do numero.
 	 * 
 	 * @param numero
-	 * @return Retorna uma string com o 'saldo + rendimento da poupan�a' e o limite
-	 *         da conta.
+	 * @return Retorna um sysout com o saldo, o limite da conta e o rendimento
+	 *         poupança.
 	 */
 	public void mostrarSaldo(int numero) {
 		ContaDAO contaDao = new ContaDAO();
@@ -146,11 +151,36 @@ public class ContaPoupanca extends Conta implements Taxas {
 	}
 
 	/**
-	 * Gera contato com o banco de dados atraves do numero.
+	 * Um metodo String que gera contato com o banco de dados atraves do numero.
 	 * 
 	 * @param numero
-	 * @return Retorna uma string com: Tipo da conta, Nome, Numero, Saldo +
-	 *         rendimento da poupan�a, Limite e Data de Atualiza��o.
+	 * @return Retorna um string com o saldo, o limite da conta e o rendimento
+	 *         poupança.
+	 */
+	public String mostrarSaldoString(int numero) {
+		ContaDAO contaDao = new ContaDAO();
+		String saldo = null;
+		String limite = null;
+		String rendimento = null;
+		for (ContaPoupanca c : contaDao.getContatoPoupanca(numero)) {
+			LocalDateTime hojecompara = LocalDateTime.now();
+			LocalDateTime hoje = c.getDataAtualizacao();
+			Duration hoje2 = Duration.between(hoje, hojecompara);
+			saldo = c.getSaldo().multiply(new BigDecimal(hoje2.toMinutes() * 0.005)).add(c.getSaldo())
+					.setScale(2, RoundingMode.HALF_EVEN).toString();
+			limite = c.getLimite().toString();
+			rendimento = c.getSaldo().multiply(new BigDecimal(hoje2.toMinutes() * 0.005))
+					.setScale(2, RoundingMode.HALF_EVEN).toString();
+		}
+		return "Saldo: " + saldo + "\nLimite: " + limite + "\nRendimento da poupança: " + rendimento;
+	}
+
+	/**
+	 * Um metodo void que gera contato com o banco de dados atraves do numero.
+	 * 
+	 * @param numero
+	 * @return Retorna um sysout com: Tipo da conta, Nome, Numero, 'Saldo +
+	 *         Rendimento Poupança', Limite e Data de Atualização.
 	 */
 	public void mostrarDados(int numero) {
 		ContaDAO contaDao = new ContaDAO();
@@ -164,6 +194,36 @@ public class ContaPoupanca extends Conta implements Taxas {
 									.setScale(2, RoundingMode.HALF_EVEN)
 							+ "\nLimite: " + c.getLimite() + "\nData de Atualiza��o: " + c.getDataAtualizacao());
 		}
+	}
+
+	/**
+	 * Um metodo String que gera contato com o banco de dados atraves do numero.
+	 * 
+	 * @param numeroDaConta
+	 * @return Retorna um string com: Nome, Numero, 'Saldo + Rendimento Poupança',
+	 *         Limite e Data de Cadastro.
+	 */
+	public String mostrarDadosString(int numeroDaConta) {
+		ContaDAO contaDao = new ContaDAO();
+		String nome = null;
+		String numero = null;
+		String saldo = null;
+		String limite = null;
+		String dataCadastro = null;
+		for (ContaPoupanca c : contaDao.getContatoPoupanca(numeroDaConta)) {
+			LocalDateTime hojecompara = LocalDateTime.now();
+			LocalDateTime hoje = c.getDataAtualizacao();
+			Duration hoje2 = Duration.between(hoje, hojecompara);
+			nome = c.getNome();
+			numero = String.valueOf(c.getNumero());
+			saldo = c.getSaldo().multiply(new BigDecimal(hoje2.toMinutes() * 0.005)).add(c.getSaldo())
+					.setScale(2, RoundingMode.HALF_EVEN).toString();
+			limite = c.getLimite().toString();
+			dataCadastro = c.getDataCadastro().toString();
+
+		}
+		return "Nome: " + nome + "\nNumero: " + numero + "\nSaldo: " + saldo + "\nLimite" + limite
+				+ "\nData de cadastro: " + dataCadastro;
 	}
 
 	/**
@@ -182,13 +242,13 @@ public class ContaPoupanca extends Conta implements Taxas {
 	}
 
 	/**
-	 * Verifica se o 'saldo da conta + rendimento da poupan�a' � maior que o valor
+	 * Verifica se o 'saldo da conta + rendimento da poupança' é maior que o valor
 	 * inserido. Gera contato com o banco de dados atraves do numero.
 	 * 
 	 * @param numero
 	 * @param valor
-	 * @return Se o saldo for menor que o valor a opera��o ir� retornar false, mas
-	 *         se for maior ela ir� retornar true. *
+	 * @return Se o saldo for menor que o valor a operação irá retornar false, mas
+	 *         se for maior ela irá retornar true. *
 	 */
 	public boolean verificaSaldo(int numero, BigDecimal valor) {
 		ContaDAO contaDao = new ContaDAO();
@@ -207,7 +267,17 @@ public class ContaPoupanca extends Conta implements Taxas {
 		}
 		return true;
 	}
-	
+
+	/**
+	 * Verifica se o 'saldo da conta + taxa de saque + rendimento da poupança' é
+	 * maior que o valor inserido. Gera contato com o banco de dados atraves do
+	 * numero.
+	 * 
+	 * @param numero
+	 * @param valor
+	 * @return Se o saldo for menor que o valor a operação irá retornar false, mas
+	 *         se for maior ela irá retornar true. *
+	 */
 	public boolean verificaSaldoSaque(int numero, BigDecimal valor) {
 		ContaDAO contaDao = new ContaDAO();
 		for (ContaPoupanca c : contaDao.getContatoPoupanca(numero)) {
@@ -225,7 +295,17 @@ public class ContaPoupanca extends Conta implements Taxas {
 		}
 		return true;
 	}
-	
+
+	/**
+	 * Verifica se o 'saldo da conta + taxa de transferência + rendimento da
+	 * poupança' é maior que o valor inserido. Gera contato com o banco de dados
+	 * atraves do numero.
+	 * 
+	 * @param numero
+	 * @param valor
+	 * @return Se o saldo for menor que o valor a operação irá retornar false, mas
+	 *         se for maior ela irá retornar true. *
+	 */
 	public boolean verificaSaldoTransfere(int numero, BigDecimal valor) {
 		ContaDAO contaDao = new ContaDAO();
 		for (ContaPoupanca c : contaDao.getContatoPoupanca(numero)) {
@@ -303,6 +383,73 @@ public class ContaPoupanca extends Conta implements Taxas {
 	}
 
 	/**
+	 * Compara se a conta de saque tem saldo e se a conta de destino tem o limite
+	 * necessario para o deposito.
+	 * 
+	 * @param contaSaque
+	 * @param contaDestino
+	 * @param valor
+	 * @return Retorna 1 se a contaSaque tem saldo e a contaDestino tem limite.
+	 *         Retorna -1 se a contaSaque não tem saldo. Retorna 0 se a contaDestino
+	 *         não tem limite. Retorna 2 se nenhum parametro foi atendido.
+	 */
+	public int transfereCompara(int contaSaque, int contaDestino, BigDecimal valor) {
+		ContaDAO contaDaoSaque = new ContaDAO();
+		ContaDAO contaDaoDestino = new ContaDAO();
+		for (ContaPoupanca cS : contaDaoSaque.getContatoPoupanca(contaSaque)) {
+			for (ContaCorrente cD : contaDaoDestino.getContatoCorrente(contaDestino)) {
+				valor.add(this.taxaTransferencia());
+				if (cS.verificaSaldoTransfere(contaSaque, valor) && cD.verificaLimite(contaDestino, valor) == true) {
+					return 1;
+				} else {
+					if (cD.verificaLimite(contaDestino, valor) == true) {
+						return 0;
+					} else {
+						return -1;
+					}
+				}
+			}
+		}
+		return 2;
+	}
+
+	/**
+	 * Um metodo string que transfere o saldo da contaSaque para a contaDestino.
+	 * 
+	 * @param contaSaque
+	 * @param contaDestino
+	 * @param valor
+	 * @return Retorna uma string se a contaSaque tem saldo e a contaDestino tem
+	 *         limite e faz a transferencia. Agora se a contaSaque não tem saldo e a
+	 *         contaDestino não tem limite retorna uma String especifica para cada
+	 *         ocasião.
+	 */
+	public String transfereString(int contaSaque, int contaDestino, BigDecimal valor) {
+		ContaDAO contaDaoSaque = new ContaDAO();
+		ContaDAO contaDaoDestino = new ContaDAO();
+		for (ContaPoupanca cS : contaDaoSaque.getContatoPoupanca(contaSaque)) {
+			for (ContaCorrente cD : contaDaoDestino.getContatoCorrente(contaDestino)) {
+				valor.add(this.taxaTransferencia());
+
+				if (cS.verificaSaldoTransfere(contaSaque, valor) && cD.verificaLimite(contaDestino, valor) == true) {
+					cS.saca(contaSaque, valor.subtract(new BigDecimal("10.3")));
+					cD.deposita(contaDestino, valor);
+					return "Transação concluida!";
+				} else {
+					if (cD.verificaLimite(contaDestino, valor) == true) {
+						System.out.println("Saldo de '" + cS.getNome() + "' insuficiente, transação não concluida.");
+						return "Saldo de '" + cS.getNome() + "' insuficiente, transação não concluida.";
+					} else {
+						System.out.println("Limite de '" + cD.getNome() + "' excedido, transação não concluida.");
+						return "Limite de '" + cD.getNome() + "' excedido, transação não concluida.";
+					}
+				}
+			}
+		}
+		return "Erro não encontrado";
+	}
+
+	/**
 	 * Retorna o nome e o tipo da conta. Gera contato com o banco de dados atraves
 	 * do numero.
 	 * 
@@ -324,95 +471,5 @@ public class ContaPoupanca extends Conta implements Taxas {
 				System.out.println("Tipo de conta n�o encontrada.");
 			}
 		}
-	}
-
-	public void inserirDados(String nome, int numero, BigDecimal limite, BigDecimal saldo) {
-		super.inserirDados(nome, numero, limite, saldo);
-	}
-
-	public String mostrarDadosString(int numeroDaConta) {
-		ContaDAO contaDao = new ContaDAO();
-		String nome = null;
-		String numero = null;
-		String saldo = null;
-		String limite = null;
-		String dataCadastro = null;
-		for (ContaPoupanca c : contaDao.getContatoPoupanca(numeroDaConta)) {
-			LocalDateTime hojecompara = LocalDateTime.now();
-			LocalDateTime hoje = c.getDataAtualizacao();
-			Duration hoje2 = Duration.between(hoje, hojecompara);
-			nome = c.getNome();
-			numero = String.valueOf(c.getNumero());
-			saldo = c.getSaldo().multiply(new BigDecimal(hoje2.toMinutes() * 0.005)).add(c.getSaldo())
-					.setScale(2, RoundingMode.HALF_EVEN).toString();
-			limite = c.getLimite().toString();
-			dataCadastro = c.getDataCadastro().toString();
-
-		}
-		return "Nome: " + nome + "\nNumero: " + numero + "\nSaldo: " + saldo + "\nLimite" + limite
-				+ "\nData de cadastro: " + dataCadastro;
-	}
-	
-	public String mostrarSaldoString(int numero) {
-		ContaDAO contaDao = new ContaDAO();
-		String saldo = null;
-		String limite = null;
-		String rendimento = null;
-		for (ContaPoupanca c : contaDao.getContatoPoupanca(numero)) {
-			LocalDateTime hojecompara = LocalDateTime.now();
-			LocalDateTime hoje = c.getDataAtualizacao();
-			Duration hoje2 = Duration.between(hoje, hojecompara);
-			saldo = c.getSaldo().multiply(new BigDecimal(hoje2.toMinutes() * 0.005))
-					.add(c.getSaldo()).setScale(2, RoundingMode.HALF_EVEN).toString();
-			limite = c.getLimite().toString();
-			rendimento = c.getSaldo().multiply(new BigDecimal(hoje2.toMinutes() * 0.005)).setScale(2, RoundingMode.HALF_EVEN).toString();
-		}
-		return "Saldo: " + saldo + "\nLimite: " + limite + "\nRendimento da poupança: " + rendimento;
-
-	}
-	
-	public int transfereCompara(int contaSaque, int contaDestino, BigDecimal valor) {
-		ContaDAO contaDaoSaque = new ContaDAO();
-		ContaDAO contaDaoDestino = new ContaDAO();
-		for (ContaPoupanca cS : contaDaoSaque.getContatoPoupanca(contaSaque)) {
-			for (ContaCorrente cD : contaDaoDestino.getContatoCorrente(contaDestino)) {
-				valor.add(this.taxaTransferencia());
-				if (cS.verificaSaldoTransfere(contaSaque, valor) && cD.verificaLimite(contaDestino, valor) == true) {
-					return 1;
-				} else {
-					if (cD.verificaLimite(contaDestino, valor) == true) {
-						return 0;
-					} else {
-						return -1;
-					}
-				}
-			}
-		}
-		return 2;
-	}
-	
-	public String transfereString(int contaSaque, int contaDestino, BigDecimal valor) {
-		ContaDAO contaDaoSaque = new ContaDAO();
-		ContaDAO contaDaoDestino = new ContaDAO();
-		for (ContaPoupanca cS : contaDaoSaque.getContatoPoupanca(contaSaque)) {
-			for (ContaCorrente cD : contaDaoDestino.getContatoCorrente(contaDestino)) {
-				valor.add(this.taxaTransferencia());
-				
-				if (cS.verificaSaldoTransfere(contaSaque, valor) && cD.verificaLimite(contaDestino, valor) == true) {
-					cS.saca(contaSaque, valor.subtract(new BigDecimal("10.3")));
-					cD.deposita(contaDestino, valor);
-					return "Transação concluida!";
-				} else {
-					if (cD.verificaLimite(contaDestino, valor) == true) {
-						System.out.println("Saldo de '" + cS.getNome() + "' insuficiente, transação não concluida.");
-						return "Saldo de '" + cS.getNome() + "' insuficiente, transação não concluida.";
-					} else {
-						System.out.println("Limite de '" + cD.getNome() + "' excedido, transação não concluida.");
-						return "Limite de '" + cD.getNome() + "' excedido, transação não concluida.";
-					}
-				}
-			}
-		}
-		return "Erro não encontrado";
 	}
 }

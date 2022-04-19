@@ -19,8 +19,16 @@ public class AtualizacaoContaForm {
 		return dataAtualizacao;
 	}
 
-	public Conta atualizar(int numero, ContaRepositoryAtualizacao contaRepository) {
-		Conta conta = contaRepository.findByNumero(numero);
+	/**
+	 * A partir do numero da conta este metodo atualiza o saldo da conta e a data de atualização.
+	 * 
+	 * @param numero
+	 * @param contaRepositoryAtualizacao
+	 * @return Retorna um novo saldo e uma nova data de atualização.
+	 * 
+	 */
+	public Conta atualizar(int numero, ContaRepositoryAtualizacao contaRepositoryAtualizacao) {
+		Conta conta = contaRepositoryAtualizacao.findByNumero(numero);
 
 		conta.setSaldo(saldo);
 		conta.setDataAtualizacao(dataAtualizacao);

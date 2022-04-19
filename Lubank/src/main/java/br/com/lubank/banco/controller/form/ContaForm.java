@@ -39,10 +39,30 @@ public class ContaForm {
 		return dataAtualizacao;
 	}
 
+	/**
+	 * Converte os dados {nome, saldo, limite} em uma conta corrente.
+	 * Gera um numero aleatorio mas diferente de todos registrados no banco de dados.
+	 * 
+	 * @param numero
+	 * @param nome
+	 * @param saldo
+	 * @param limite
+	 * @return Retorna uma conta corrente.
+	 */
 	public ContaCorrente converterContaCorrente() {
 		return new ContaCorrente(numero, nome, saldo, limite);
 	}
 	
+	/**
+	 * Converte os dados {nome, saldo, limite} em uma conta poupança.
+	 * Gera um numero aleatorio mas diferente de todos registrados no banco de dados.
+	 * 
+	 * @param numero
+	 * @param nome
+	 * @param saldo
+	 * @param limite
+	 * @return Retorna uma conta poupança.
+	 */
 	public ContaPoupanca converterContaPoupanca() {
 		return new ContaPoupanca(numero, nome, saldo, limite);
 	}
