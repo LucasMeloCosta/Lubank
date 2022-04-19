@@ -35,7 +35,7 @@ public class ContaDAO implements Serializable {
 	 */
 	public void saveContaCorrente(ContaCorrente contato) {
 
-		String sql = "INSERT INTO contas(nome, saldo, datacadastro, numero, limite, DataAtualizacao, TipoDeConta) VALUES (?, ?, ?, ?, ?, ?, ?)";
+		String sql = "INSERT INTO conta(nome, saldo, datacadastro, numero, limite, DataAtualizacao, TipoDeConta, DTYPE) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
 		Connection conn = null;
 		PreparedStatement pstm = null;
@@ -53,6 +53,7 @@ public class ContaDAO implements Serializable {
 			pstm.setBigDecimal(5, contato.getLimite());
 			pstm.setTimestamp(6, Timestamp.valueOf(LocalDateTime.now()));
 			pstm.setString(7, contato.getTipoDeConta());
+			pstm.setString(8, contato.getTipoDeConta());
 
 			// Executar a query
 			pstm.execute();
@@ -81,7 +82,7 @@ public class ContaDAO implements Serializable {
 	 */
 	public void saveContaPoupanca(ContaPoupanca contato) {
 
-		String sql = "INSERT INTO contas(nome, saldo, datacadastro, numero, limite, DataAtualizacao, TipoDeConta) VALUES (?, ?, ?, ?, ?, ?, ?)";
+		String sql = "INSERT INTO conta(nome, saldo, datacadastro, numero, limite, DataAtualizacao, TipoDeConta, DTYPE) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
 		Connection conn = null;
 		PreparedStatement pstm = null;
@@ -99,6 +100,7 @@ public class ContaDAO implements Serializable {
 			pstm.setBigDecimal(5, contato.getLimite());
 			pstm.setTimestamp(6, Timestamp.valueOf(LocalDateTime.now()));
 			pstm.setString(7, contato.getTipoDeConta());
+			pstm.setString(8, contato.getTipoDeConta());
 
 			// Executar a query
 			pstm.execute();
@@ -127,7 +129,7 @@ public class ContaDAO implements Serializable {
 	 */
 	public void updateContaCorrente(ContaCorrente contato) {
 
-		String sql = "UPDATE contas SET saldo = ?, DataAtualizacao = ? WHERE numero = ?";
+		String sql = "UPDATE conta SET saldo = ?, DataAtualizacao = ? WHERE numero = ?";
 
 		Connection conn = null;
 		PreparedStatement pstm = null;
@@ -167,7 +169,7 @@ public class ContaDAO implements Serializable {
 	 */
 	public void updateContaPoupanca(ContaPoupanca contato) {
 
-		String sql = "UPDATE contas SET saldo = ?, DataAtualizacao = ? WHERE numero = ?";
+		String sql = "UPDATE conta SET saldo = ?, DataAtualizacao = ? WHERE numero = ?";
 
 		Connection conn = null;
 		PreparedStatement pstm = null;
@@ -206,7 +208,7 @@ public class ContaDAO implements Serializable {
 	 */
 	public void deleteByID(int numero) {
 
-		String sql = "DELETE FROM contas WHERE numero = ?";
+		String sql = "DELETE FROM conta WHERE numero = ?";
 
 		Connection conn = null;
 		PreparedStatement pstm = null;
@@ -244,7 +246,7 @@ public class ContaDAO implements Serializable {
 	 */
 	public List<ContaCorrente> getContatoCorrente(int numero) {
 
-		String sql = "SELECT * FROM contas";
+		String sql = "SELECT * FROM conta";
 
 		List<ContaCorrente> contatos = new ArrayList<>();
 
@@ -271,7 +273,7 @@ public class ContaDAO implements Serializable {
 				contato.setSaldo(rset.getBigDecimal("Saldo"));
 				// Recuperar a data de cadastro
 //				pstm.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
-				contato.setDataCadastro(rset.getDate("DataCadastro").toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+				contato.setDataCadastro(rset.getTimestamp("DataCadastro").toLocalDateTime());
 				// Recuperar a data de Atualizacao
 				contato.setDataAtualizacao(rset.getTimestamp("DataAtualizacao").toLocalDateTime());
 				// Recuperar o Limite
@@ -309,7 +311,7 @@ public class ContaDAO implements Serializable {
 	 */
 	public List<ContaPoupanca> getContatoPoupanca(int numero) {
 
-		String sql = "SELECT * FROM contas";
+		String sql = "SELECT * FROM conta";
 
 		List<ContaPoupanca> contatos = new ArrayList<>();
 
@@ -335,7 +337,7 @@ public class ContaDAO implements Serializable {
 				// Recuperar o saldo
 				contato.setSaldo(rset.getBigDecimal("Saldo"));
 				// Recuperar a data de cadastro
-				contato.setDataCadastro(rset.getDate("DataCadastro").toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+				contato.setDataCadastro(rset.getTimestamp("DataCadastro").toLocalDateTime());
 				// Recuperar a data de Atualizacao
 				contato.setDataAtualizacao(rset.getTimestamp("DataAtualizacao").toLocalDateTime());
 				// Recuperar o Limite
@@ -372,7 +374,7 @@ public class ContaDAO implements Serializable {
 	 */
 	public Integer geraNumero() {
 
-		String sql = "SELECT * FROM contas";
+		String sql = "SELECT * FROM conta";
 
 		HashSet<Integer> contatos = new HashSet<Integer>();
 		List<Integer> contatos2 = new ArrayList<Integer>();
@@ -436,7 +438,7 @@ public class ContaDAO implements Serializable {
 		
 
 
-		String sql = "SELECT * FROM contas";
+		String sql = "SELECT * FROM conta";
 
 		List<Integer> contatos = new ArrayList<Integer>();
 
@@ -458,9 +460,9 @@ public class ContaDAO implements Serializable {
 				contato.setNumero(rset.getInt("Numero"));
 
 				if (contato.getNumeroBoolean(numero)) {
-					if (contato.getTipoDeConta().equals("Conta Corrente")) {
+					if (contato.getTipoDeConta().equals("ContaCorrente")) {
 						contatos.add(0, 001);
-					} else if (contato.getTipoDeConta().equals("Conta Poupan�a")) {
+					} else if (contato.getTipoDeConta().equals("ContaPoupanca")) {
 						contatos.add(0, 013);
 					}
 				} else {

@@ -37,11 +37,11 @@ public abstract class Conta implements Serializable {
 	protected Conta(int tipoDeConta) {
 		Conta.total++;
 		if (tipoDeConta == 001) {
-			String tipoDeContaString = "Conta Corrente";
+			String tipoDeContaString = "ContaCorrente";
 			this.tipoDeConta = tipoDeContaString;
 		} else {
 			if (tipoDeConta == 013) {
-				String tipoDeContaString = "Conta Poupanca";
+				String tipoDeContaString = "ContaPoupanca";
 				this.tipoDeConta = tipoDeContaString;
 			} else {
 				String tipoDeContaString = "Tipo de conta não encontrada.";
@@ -57,11 +57,11 @@ public abstract class Conta implements Serializable {
 		this.saldo = saldo;
 		this.limite = limite;
 		if (tipoDeConta == 001) {
-			String tipoDeContaString = "Conta Corrente";
+			String tipoDeContaString = "ContaCorrente";
 			this.tipoDeConta = tipoDeContaString;
 		} else {
 			if (tipoDeConta == 013) {
-				String tipoDeContaString = "Conta Poupanca";
+				String tipoDeContaString = "ContaPoupanca";
 				this.tipoDeConta = tipoDeContaString;
 			} else {
 				String tipoDeContaString = "Tipo de conta não encontrada.";

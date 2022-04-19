@@ -100,7 +100,8 @@ public class TelaCadastro {
 		btnQualEscolher.setBounds(10, 199, 153, 36);
 		btnQualEscolher.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-			JOptionPane.showMessageDialog(null, "\nConta Corrente as taxas de saque e transfer�ncias s�o significativamente baixas." + "\nConta Poupan�a seu dinheiro rende por minuto 0,5% mas as taxas de saque e transfer�ncias s�o significativamente altas.","Diferen�as", 0, logoLubank);
+			JOptionPane.showMessageDialog(null, "\nConta Corrente as taxas de saque e transferências são significativamente baixas.{Saque = $2.50, Transferência = $1.20}" 
+		+ "\nConta Poupança seu dinheiro rende por minuto 0,5% mas as taxas de saque e transferências são significativamente altas.{Saque = $50.50, Transferência = $1.20}","Diferenças", 0, logoLubank);
 		}
 	});
 		frame.getContentPane().add(btnQualEscolher);

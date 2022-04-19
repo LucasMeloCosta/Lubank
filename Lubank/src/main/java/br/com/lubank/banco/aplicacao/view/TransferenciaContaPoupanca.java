@@ -104,7 +104,7 @@ public class TransferenciaContaPoupanca {
 				int contaDestino = Integer.parseInt(textNumeroContaDeDestino.getText());
 				if (minhaContaPoupanca.transfereCompara(numeroDaConta, contaDestino,valor) == 1) {
 					minhaContaPoupanca.transfereString(numeroDaConta, contaDestino,valor);
-					JOptionPane.showMessageDialog(null, "Dinheiro sacado!", "Parab�ns", 0, logoLubank);
+					JOptionPane.showMessageDialog(null, "Dinheiro transferido!", "Parabéns", 0, logoLubank);
 					frame.dispose();
 					TelaMenu telaMenu = new TelaMenu(numeroDaConta);
 					telaMenu.newScreen(numeroDaConta);

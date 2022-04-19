@@ -74,7 +74,7 @@ public class ContaPoupanca extends Conta implements Taxas {
 			Duration hoje2 = Duration.between(hoje, hojecompara);
 			Float v1 = c.getSaldo().multiply(new BigDecimal(hoje2.toMinutes() * 0.005)).add(c.getSaldo())
 					.setScale(2, RoundingMode.HALF_EVEN).floatValue();
-			Float v2 = valor.floatValue();
+			Float v2 = valor.add(this.taxaSaque()).floatValue();
 			if (v1 < v2) {
 				System.out.println("Saldo insuficiente.");
 				return false;
@@ -207,6 +207,42 @@ public class ContaPoupanca extends Conta implements Taxas {
 		}
 		return true;
 	}
+	
+	public boolean verificaSaldoSaque(int numero, BigDecimal valor) {
+		ContaDAO contaDao = new ContaDAO();
+		for (ContaPoupanca c : contaDao.getContatoPoupanca(numero)) {
+			LocalDateTime hojecompara = LocalDateTime.now();
+			LocalDateTime hoje = c.getDataAtualizacao();
+			Duration hoje2 = Duration.between(hoje, hojecompara);
+			Float v1 = c.getSaldo().multiply(new BigDecimal(hoje2.toMinutes() * 0.005)).add(c.getSaldo())
+					.setScale(2, RoundingMode.HALF_EVEN).floatValue();
+			Float v2 = valor.add(this.taxaSaque()).floatValue();
+			if (v1 < v2) {
+				return false;
+			} else {
+				return true;
+			}
+		}
+		return true;
+	}
+	
+	public boolean verificaSaldoTransfere(int numero, BigDecimal valor) {
+		ContaDAO contaDao = new ContaDAO();
+		for (ContaPoupanca c : contaDao.getContatoPoupanca(numero)) {
+			LocalDateTime hojecompara = LocalDateTime.now();
+			LocalDateTime hoje = c.getDataAtualizacao();
+			Duration hoje2 = Duration.between(hoje, hojecompara);
+			Float v1 = c.getSaldo().multiply(new BigDecimal(hoje2.toMinutes() * 0.005)).add(c.getSaldo())
+					.setScale(2, RoundingMode.HALF_EVEN).floatValue();
+			Float v2 = valor.add(this.taxaTransferencia()).floatValue();
+			if (v1 < v2) {
+				return false;
+			} else {
+				return true;
+			}
+		}
+		return true;
+	}
 
 	/**
 	 * Verifica se o valor inserido � menor que o 'limite - saldo da conta'. Gera
@@ -224,7 +260,7 @@ public class ContaPoupanca extends Conta implements Taxas {
 			LocalDateTime hoje = c.getDataAtualizacao();
 			Duration hoje2 = Duration.between(hoje, hojecompara);
 			Float v1 = valor.floatValue();
-			Float v2 = this.limite.floatValue();
+			Float v2 = c.getLimite().floatValue();
 			if (v1 > v2 - c.getSaldo().multiply(new BigDecimal(hoje2.toMinutes() * 0.005)).add(c.getSaldo())
 					.setScale(2, RoundingMode.HALF_EVEN).doubleValue()) {
 				return false;
@@ -252,7 +288,7 @@ public class ContaPoupanca extends Conta implements Taxas {
 		ContaDAO contaDaoDestino = new ContaDAO();
 		for (ContaPoupanca cS : contaDaoSaque.getContatoPoupanca(contaSaque)) {
 			for (ContaPoupanca cD : contaDaoDestino.getContatoPoupanca(contaDestino)) {
-				if (cS.verificaSaldo(contaSaque, valor) && cD.verificaLimite(contaDestino, valor) == true) {
+				if (cS.verificaSaldoTransfere(contaSaque, valor) && cD.verificaLimite(contaDestino, valor) == true) {
 					cS.saca(contaSaque, valor.subtract(new BigDecimal("10.30")));
 					cD.deposita(contaDestino, valor);
 				} else {
@@ -341,7 +377,7 @@ public class ContaPoupanca extends Conta implements Taxas {
 		for (ContaPoupanca cS : contaDaoSaque.getContatoPoupanca(contaSaque)) {
 			for (ContaCorrente cD : contaDaoDestino.getContatoCorrente(contaDestino)) {
 				valor.add(this.taxaTransferencia());
-				if (cS.verificaSaldo(contaSaque, valor) && cD.verificaLimite(contaDestino, valor) == true) {
+				if (cS.verificaSaldoTransfere(contaSaque, valor) && cD.verificaLimite(contaDestino, valor) == true) {
 					return 1;
 				} else {
 					if (cD.verificaLimite(contaDestino, valor) == true) {
@@ -362,8 +398,8 @@ public class ContaPoupanca extends Conta implements Taxas {
 			for (ContaCorrente cD : contaDaoDestino.getContatoCorrente(contaDestino)) {
 				valor.add(this.taxaTransferencia());
 				
-				if (cS.verificaSaldo(contaSaque, valor) && cD.verificaLimite(contaDestino, valor) == true) {
-					cS.saca(contaSaque, valor.subtract(new BigDecimal("1.3")));
+				if (cS.verificaSaldoTransfere(contaSaque, valor) && cD.verificaLimite(contaDestino, valor) == true) {
+					cS.saca(contaSaque, valor.subtract(new BigDecimal("10.3")));
 					cD.deposita(contaDestino, valor);
 					return "Transação concluida!";
 				} else {

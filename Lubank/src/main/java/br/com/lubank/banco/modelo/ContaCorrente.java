@@ -60,16 +60,15 @@ public class ContaCorrente extends Conta implements Taxas {
  * mas se for maior ela ir� retornar true e o saldo vai ser atualizado no banco de dados.
  */
 	public boolean saca(int numero, BigDecimal valor) {
-		ContaDAO contaDao = new ContaDAO();
-		valor.add(this.taxaSaque());
+		ContaDAO contaDao = new ContaDAO();;
 		for (ContaCorrente c : contaDao.getContatoCorrente(numero)) {
 			Float v1 = c.getSaldo().floatValue();
-			Float v2 = valor.floatValue();
+			Float v2 = valor.add(this.taxaSaque()).floatValue();
 			if (v1 < v2) {
 				System.out.println("Saldo insuficiente.");
 				return false;
 			} else {
-				c.saldo = c.saldo.subtract(valor);
+				c.saldo = c.saldo.subtract(valor).subtract(this.taxaSaque());
 				System.out.println(
 						"Transa�ao concluida!\n{O saldo da conta de '" + c.getNome() + "' �: " + c.saldo + "}");
 				contaDao.updateContaCorrente(c);
@@ -168,6 +167,34 @@ public class ContaCorrente extends Conta implements Taxas {
 		}
 		return true;
 	}
+	
+	public boolean verificaSaldoSaque(int numero, BigDecimal valor) {
+		ContaDAO contaDao = new ContaDAO();
+		for (ContaCorrente c : contaDao.getContatoCorrente(numero)) {
+			Float v1 = c.getSaldo().floatValue();
+			Float v2 = valor.add(this.taxaSaque()).floatValue();
+			if (v1 < v2) {
+				return false;
+			} else {
+				return true;
+			}
+		}
+		return true;
+	}
+	
+	public boolean verificaSaldoTransfere(int numero, BigDecimal valor) {
+		ContaDAO contaDao = new ContaDAO();
+		for (ContaCorrente c : contaDao.getContatoCorrente(numero)) {
+			Float v1 = c.getSaldo().floatValue();
+			Float v2 = valor.add(this.taxaTransferencia()).floatValue();
+			if (v1 < v2) {
+				return false;
+			} else {
+				return true;
+			}
+		}
+		return true;
+	}
 /**
  * Verifica se o valor inserido � maior que o limite da conta subtraido pelo saldo da conta.
  * Gera contato com o banco de dados atraves do numero.
@@ -176,16 +203,17 @@ public class ContaCorrente extends Conta implements Taxas {
  * @param valor
  * @return Se o valor for maior ir� retornar false, mas se for menor ir� retornar true.
  */
+	
 	public Boolean verificaLimite(int numero, BigDecimal valor) {
 		ContaDAO contaDao = new ContaDAO();
 		for (ContaCorrente c : contaDao.getContatoCorrente(numero)) {
-			Float v1 = valor.floatValue();
-			Float v2 = this.limite.floatValue();
-			if (v1 > v2 - c.getSaldo().doubleValue()) {
+			BigDecimal v1 = valor;
+			BigDecimal v2 = c.getLimite();
+			if (v1.compareTo(v2.subtract(c.getSaldo())) == 1) {
 				return false;
-			} else {
-				return true;
-			}
+			} else if (v1.compareTo(v2.subtract(c.getSaldo())) == 0){
+				return false;
+			}				
 		}
 		return true;
 	}
@@ -281,7 +309,7 @@ public class ContaCorrente extends Conta implements Taxas {
 		for (ContaCorrente cS : contaDaoSaque.getContatoCorrente(contaSaque)) {
 			for (ContaCorrente cD : contaDaoDestino.getContatoCorrente(contaDestino)) {
 				valor.add(this.taxaTransferencia());
-				if (cS.verificaSaldo(contaSaque, valor) && cD.verificaLimite(contaDestino, valor) == true) {
+				if (cS.verificaSaldoTransfere(contaSaque, valor) && cD.verificaLimite(contaDestino, valor) == true) {
 					return 1;
 				} else {
 					if (cD.verificaLimite(contaDestino, valor) == true) {
@@ -301,7 +329,7 @@ public class ContaCorrente extends Conta implements Taxas {
 		for (ContaCorrente cS : contaDaoSaque.getContatoCorrente(contaSaque)) {
 			for (ContaCorrente cD : contaDaoDestino.getContatoCorrente(contaDestino)) {
 				valor.add(this.taxaTransferencia());
-				if (cS.verificaSaldo(contaSaque, valor) && cD.verificaLimite(contaDestino, valor) == true) {
+				if (cS.verificaSaldoTransfere(contaSaque, valor) && cD.verificaLimite(contaDestino, valor) == true) {
 					cS.saca(contaSaque, valor.subtract(new BigDecimal("1.3")));
 					cD.deposita(contaDestino, valor);
 					return "Transação concluida!";
